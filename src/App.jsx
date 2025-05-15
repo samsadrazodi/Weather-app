@@ -41,8 +41,15 @@ export default function WeatherApp() {
   };
 
   const toggleUnit = () => {
-    setUnit((prev) => (prev === "metric" ? "imperial" : "metric"));
+    setUnit((prevUnit) => {
+      const newUnit = prevUnit === "metric" ? "imperial" : "metric";
+      setTimeout(() => {
+        if (city.trim()) fetchWeather(); // refetch with new unit
+      }, 0);
+      return newUnit;
+    });
   };
+  
 
   const getBackgroundClass = (condition) => {
     if (!condition) return "bg-default";
