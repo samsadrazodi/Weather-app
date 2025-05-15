@@ -1,0 +1,7 @@
+/* index.css - keep it minimal */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  background-color: transparent;
+  color: inherit;
+}
