@@ -9,30 +9,30 @@ export default function WeatherApp() {
   const [error, setError] = useState("");
   const [unit, setUnit] = useState("metric");
 
-  const fetchWeather = async () => {
+  const fetchWeather = async (unitOverride = unit) => {
     if (!city.trim()) return;
 
     try {
       setError("");
       const apiKey = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
 
-
       const weatherRes = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${unit}`
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${unitOverride}`
       );
+
       if (!weatherRes.ok) {
         const errData = await weatherRes.json();
         throw new Error(errData.message || "City not found");
       }
+
       const weatherData = await weatherRes.json();
       setWeather(weatherData);
 
       const forecastRes = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${unit}`
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${unitOverride}`
       );
       const forecastData = await forecastRes.json();
       setForecast(forecastData.list.slice(0, 8));
-
     } catch (err) {
       setWeather(null);
       setForecast([]);
@@ -41,7 +41,11 @@ export default function WeatherApp() {
   };
 
   const toggleUnit = () => {
-    setUnit((prev) => (prev === "metric" ? "imperial" : "metric"));
+    const newUnit = unit === "metric" ? "imperial" : "metric";
+    setUnit(newUnit);
+    if (city.trim()) {
+      fetchWeather(newUnit);
+    }
   };
 
   const getBackgroundClass = (condition) => {
@@ -61,7 +65,7 @@ export default function WeatherApp() {
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-12 col-md-10 col-lg-8 col-xl-6">
-            <h1 className="text-center text-white mb-4">Sam's Weather App</h1>
+            <h1 className="text-center text-white mb-4">Weather App</h1>
             <div className="input-group mb-3">
               <input
                 type="text"
@@ -71,7 +75,7 @@ export default function WeatherApp() {
                 onChange={(e) => setCity(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && fetchWeather()}
               />
-              <button className="btn btn-primary" onClick={fetchWeather}>
+              <button className="btn btn-primary" onClick={() => fetchWeather()}>
                 Search
               </button>
             </div>
